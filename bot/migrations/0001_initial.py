@@ -15,21 +15,49 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='QuestionAnswer',
+            name="QuestionAnswer",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('question', models.CharField(max_length=255)),
-                ('answer', models.CharField(max_length=255)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("question", models.CharField(max_length=255)),
+                ("answer", models.CharField(max_length=255)),
             ],
         ),
         migrations.CreateModel(
-            name='ChatSession',
+            name="ChatSession",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('topic', models.CharField(max_length=255)),
-                ('creation_date_time', models.DateTimeField(auto_now_add=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('qa', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='bot.questionanswer')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("topic", models.CharField(max_length=255)),
+                ("creation_date_time", models.DateTimeField(auto_now_add=True)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "qa",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="bot.questionanswer",
+                    ),
+                ),
             ],
         ),
     ]
