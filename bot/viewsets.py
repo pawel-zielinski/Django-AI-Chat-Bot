@@ -7,7 +7,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from .models import ChatSession, QuestionAnswer
 from .permissions import HasPermissionToSession
-from .serializers import BotSerializer, MessageSerializer
+from .serializers import RoomSerializer, MessageSerializer, SessionsSerializer
 
 from openai import OpenAI
 
@@ -16,16 +16,26 @@ class SessionsViewSet(
     GenericViewSet, RetrieveModelMixin, ListModelMixin, CreateModelMixin
 ):
     queryset = ChatSession.objects.all()
-    serializer_class = BotSerializer
+    serializer_class = RoomSerializer
     permission_classes = (
         IsAuthenticated,
         # HasPermissionToSession
     )
 
-    @action(detail=False, methods=["get"])
+    def get_serializer_class(self):
+        if self.action == "list_all_sessions":
+            return SessionsSerializer
+        return RoomSerializer
+
+    @action(detail=False, methods=["get"], serializer_class=(SessionsSerializer,))
     def list_all_sessions(self, request, *args, **kwargs):
-        self.queryset = ChatSession.objects.filter(user=request.user)
-        return super().list(request, *args, **kwargs)
+        queryset = ChatSession.objects.filter(user=request.user)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     @action(detail=True, methods=["get"])
     def retrieve_session(self, request, *args, **kwargs):
@@ -35,7 +45,7 @@ class SessionsViewSet(
 
 class PromptViewset(GenericViewSet, RetrieveModelMixin, CreateModelMixin):
     queryset = ChatSession.objects.all()
-    serializer_class = BotSerializer
+    serializer_class = RoomSerializer
     permission_classes = (IsAuthenticated, HasPermissionToSession)
     CLIENT = OpenAI(api_key="your-api-key")
 
@@ -56,9 +66,11 @@ class PromptViewset(GenericViewSet, RetrieveModelMixin, CreateModelMixin):
             model="gpt-3.5-turbo", messages=[serializer.data], **temperature
         )
         self.save_qa(
-            serializer.data.get("content"), response.choices[0].message.content
+            serializer.data.get("session"),
+            serializer.data.get("content"),
+            response.choices[0].message.content,
         )
 
     @staticmethod
-    def save_qa(question, answer):
-        QuestionAnswer.objects.create(question=question, answer=answer)
+    def save_qa(session, question, answer):
+        QuestionAnswer.objects.create(session=session, question=question, answer=answer)
