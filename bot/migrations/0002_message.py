@@ -2,6 +2,7 @@
 
 import bot.models
 from django.db import migrations, models
+from django.db.models.deletion import CASCADE
 
 
 class Migration(migrations.Migration):
@@ -23,6 +24,8 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
+                ("creation_date_time", models.DateTimeField(auto_now_add=True)),
+                ("session", models.ForeignKey(on_delete=CASCADE, to="bot.chatsession")),
                 ("role", models.CharField(choices=bot.models.get_roles, max_length=16)),
                 ("content", models.CharField(max_length=1024)),
                 ("temperature", models.DecimalField(decimal_places=1, max_digits=2)),

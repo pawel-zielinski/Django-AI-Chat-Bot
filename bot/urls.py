@@ -1,10 +1,10 @@
 from django.urls import path
 from rest_framework import routers
 
-from .viewsets import SessionsViewSet, PromptViewset
+from .viewsets import SessionsViewSet, PromptViewSet
 
 router = routers.SimpleRouter()
-router.register(r"session", PromptViewset, basename="sessions")
+router.register(r"session", PromptViewSet, basename="sessions")
 urlpatterns = [
     path(
         "home/",

@@ -1,3 +1,5 @@
+import os
+
 from rest_framework import viewsets, status
 from rest_framework.mixins import RetrieveModelMixin, ListModelMixin, CreateModelMixin
 from rest_framework.permissions import IsAuthenticated
@@ -5,11 +7,13 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from .models import ChatSession, QuestionAnswer
+from .models import ChatSession, Message
 from .permissions import HasPermissionToSession
 from .serializers import RoomSerializer, MessageSerializer, SessionsSerializer
 
-from openai import OpenAI
+import google.generativeai as genai
+
+genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
 
 
 class SessionsViewSet(
@@ -17,10 +21,7 @@ class SessionsViewSet(
 ):
     queryset = ChatSession.objects.all()
     serializer_class = RoomSerializer
-    permission_classes = (
-        IsAuthenticated,
-        # HasPermissionToSession
-    )
+    permission_classes = (IsAuthenticated,)
 
     def get_serializer_class(self):
         if self.action == "list_all_sessions":
@@ -37,21 +38,31 @@ class SessionsViewSet(
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    @action(detail=True, methods=["get"])
+    @action(
+        detail=True,
+        methods=["get"],
+        permission_classes=(
+            IsAuthenticated,
+            HasPermissionToSession,
+        ),
+    )
     def retrieve_session(self, request, *args, **kwargs):
-        # odczyt odpowiedzi z modelu
         return super().retrieve(request, *args, **kwargs)
 
 
-class PromptViewset(GenericViewSet, RetrieveModelMixin, CreateModelMixin):
+class PromptViewSet(GenericViewSet, RetrieveModelMixin, CreateModelMixin):
     queryset = ChatSession.objects.all()
     serializer_class = RoomSerializer
-    permission_classes = (IsAuthenticated, HasPermissionToSession)
-    CLIENT = OpenAI(api_key="your-api-key")
+    permission_classes = (IsAuthenticated,)
 
-    @action(detail=False, methods=["post"], serializer_class=MessageSerializer)
+    def get_serializer_class(self):
+        if self.action == "create_question":
+            return MessageSerializer
+        return RoomSerializer
+
+    @action(detail=False, methods=["post"])
     def create_question(self, request, *args, **kwargs):
-        serializer = self.action["kwargs"].get("serializer_class")(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
@@ -61,16 +72,26 @@ class PromptViewset(GenericViewSet, RetrieveModelMixin, CreateModelMixin):
         )
 
     def chat_prompt(self, serializer):
-        temperature = serializer.data.popitem("temperature")
-        response = self.CLIENT.chat.completions.create(
-            model="gpt-3.5-turbo", messages=[serializer.data], **temperature
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        history = self.create_history(serializer)
+        chat = model.start_chat(
+            history=history,
         )
-        self.save_qa(
-            serializer.data.get("session"),
-            serializer.data.get("content"),
-            response.choices[0].message.content,
-        )
+        temperature = float(serializer.data.get("temperature"))
+        response = chat.send_message(serializer.data.get("content"), stream=False)
+        self.save_qa(serializer.data.get("session"), response.text, temperature)
 
     @staticmethod
-    def save_qa(session, question, answer):
-        QuestionAnswer.objects.create(session=session, question=question, answer=answer)
+    def create_history(serializer):
+        history = []
+        for role, content in Message.objects.filter(
+            session_id=serializer.data.get("session")
+        ).values_list("role", "content"):
+            history.append({"role": role, "parts": content})
+        return history
+
+    @staticmethod
+    def save_qa(session, answer, temperature):
+        Message.objects.create(
+            session_id=session, role="model", content=answer, temperature=temperature
+        )
