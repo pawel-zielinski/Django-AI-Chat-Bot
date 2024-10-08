@@ -14,7 +14,7 @@ class ChatSession(models.Model):
 
 class Message(models.Model):
     session = models.ForeignKey(
-        ChatSession, on_delete=models.CASCADE, default=ChatSession.objects.first().pk
+        ChatSession, on_delete=models.CASCADE, default=getattr(ChatSession.objects.first(), 'pk', [])
     )
     role = models.CharField(max_length=16, choices=get_roles)
     content = models.CharField(max_length=1024)

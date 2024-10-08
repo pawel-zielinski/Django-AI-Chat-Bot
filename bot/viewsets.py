@@ -18,21 +18,26 @@ import google.generativeai as genai
 genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
 
 
-class SessionsViewSet(
-    GenericViewSet, RetrieveModelMixin, ListModelMixin, CreateModelMixin
-):
+class PromptViewSet(GenericViewSet, RetrieveModelMixin, ListModelMixin, CreateModelMixin):
     queryset = ChatSession.objects.all()
     serializer_class = RoomSerializer
     permission_classes = (IsAuthenticated,)
+    serializer_action_classes = {
+        "list_all_sessions": SessionsSerializer,
+        "create": SessionsSerializer,
+        "retrieve_session": RoomSerializer,
+        "create_question": MessageSerializer,
+    }
 
     def get_serializer_class(self):
-        if self.action == "list_all_sessions":
-            return SessionsSerializer
-        return RoomSerializer
+        return self.serializer_action_classes.get(self.action, RoomSerializer)
 
-    @action(detail=False, methods=["get"], serializer_class=(SessionsSerializer,))
+    @action(
+        methods=["get"],
+        detail=False,
+    )
     def list_all_sessions(self, request, *args, **kwargs):
-        queryset = ChatSession.objects.filter(user=request.user)
+        queryset = self.filter_queryset(ChatSession.objects.filter(user=request.user))
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -44,28 +49,26 @@ class SessionsViewSet(
         detail=True,
         methods=["get"],
         permission_classes=(
-            IsAuthenticated,
-            HasPermissionToSession,
+                IsAuthenticated,
+                HasPermissionToSession,
         ),
+        queryset=ChatSession.objects.all()
     )
     def retrieve_session(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
 
-
-class PromptViewSet(GenericViewSet, RetrieveModelMixin, CreateModelMixin):
-    queryset = ChatSession.objects.all()
-    serializer_class = RoomSerializer
-    permission_classes = (IsAuthenticated,)
-
-    def get_serializer_class(self):
-        if self.action == "create_question":
-            return MessageSerializer
-        return RoomSerializer
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     @action(detail=False, methods=["post"])
     def create_question(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        if not serializer.is_valid(raise_exception=True):
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         self.chat_prompt(serializer)
