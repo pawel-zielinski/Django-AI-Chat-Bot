@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import BaseSerializer
 from rest_framework import serializers
@@ -40,6 +41,16 @@ class SessionsSerializer(serializers.Serializer):
             "topic": instance.topic,
             "creation_date_time": instance.creation_date_time,
         }
+
+    def to_internal_value(self, data):
+        return {
+            "user": User.objects.get(username=data.get("user")),
+            "topic": data.get("topic"),
+            "creation_date_time": data.get("creation_date_time"),
+        }
+
+    def create(self, validated_data):
+        return ChatSession.objects.create(**validated_data)
 
 
 class MessageSerializer(serializers.ModelSerializer):
