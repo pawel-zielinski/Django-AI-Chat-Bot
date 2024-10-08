@@ -1,5 +1,4 @@
 from django.urls import path
-from .viewsets import PromptViewSet
 
 from .viewsets import PromptViewSet
 from rest_framework_simplejwt import views as jwt_views
