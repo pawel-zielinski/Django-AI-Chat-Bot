@@ -1,0 +1,15 @@
+# Django and related packages
+Django>=3.2,<3.3
+djangorestframework>=3.12,<4.0
+django-cors-headers>=3.7,<4.0
+pytest-django>=4.4,<5.0
+python-dotenv>=0.17,<1.0
+google-generativeai>=0.8
+
+# Testing and linting
+pytest>=6.2,<7.0
+pytest-cov>=2.11,<3.0
+flake8>=3.8,<4.0
+
+# Other dependencies
+requests>=2.25,<3.0
