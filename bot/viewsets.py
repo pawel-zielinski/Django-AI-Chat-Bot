@@ -18,7 +18,9 @@ import google.generativeai as genai
 genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
 
 
-class PromptViewSet(GenericViewSet, RetrieveModelMixin, ListModelMixin, CreateModelMixin):
+class PromptViewSet(
+    GenericViewSet, RetrieveModelMixin, ListModelMixin, CreateModelMixin
+):
     queryset = ChatSession.objects.all()
     serializer_class = RoomSerializer
     permission_classes = (IsAuthenticated,)
@@ -49,10 +51,10 @@ class PromptViewSet(GenericViewSet, RetrieveModelMixin, ListModelMixin, CreateMo
         detail=True,
         methods=["get"],
         permission_classes=(
-                IsAuthenticated,
-                HasPermissionToSession,
+            IsAuthenticated,
+            HasPermissionToSession,
         ),
-        queryset=ChatSession.objects.all()
+        queryset=ChatSession.objects.all(),
     )
     def retrieve_session(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
@@ -62,7 +64,9 @@ class PromptViewSet(GenericViewSet, RetrieveModelMixin, ListModelMixin, CreateMo
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
     @action(detail=False, methods=["post"])
     def create_question(self, request, *args, **kwargs):
