@@ -18,7 +18,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from bot.viewsets import LogoutView
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("bot.urls")),
+    path("logout/", LogoutView.as_view(), name="logout"),
 ]

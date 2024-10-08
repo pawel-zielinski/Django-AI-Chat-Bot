@@ -5,7 +5,9 @@ from rest_framework.mixins import RetrieveModelMixin, ListModelMixin, CreateMode
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import ChatSession, Message
 from .permissions import HasPermissionToSession
@@ -95,3 +97,17 @@ class PromptViewSet(GenericViewSet, RetrieveModelMixin, CreateModelMixin):
         Message.objects.create(
             session_id=session, role="model", content=answer, temperature=temperature
         )
+
+
+class LogoutView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    @staticmethod
+    def post(request):
+        try:
+            refresh_token = request.data["refresh_token"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response(status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
