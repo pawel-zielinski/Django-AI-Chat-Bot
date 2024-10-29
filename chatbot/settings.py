@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +29,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [os.getenv("DOMAIN_NAME")]
 
 
 # Application definition
@@ -56,6 +59,18 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+CORS_ALLOWED_ORIGIN_REGEXES = ["http://" + os.getenv("DOMAIN_NAME") + os.getenv("PORT")]
+CORS_ALLOW_CREDENTIALS = True
+CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_DOMAIN = os.getenv("DOMAIN_NAME")
+CSRF_TRUSTED_ORIGINS = [
+    "http://" + os.getenv("DOMAIN_NAME") + os.getenv("PORT"),
+]
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_DOMAIN = os.getenv("DOMAIN_NAME")
+SESSION_COOKIE_HTTPONLY = True
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [

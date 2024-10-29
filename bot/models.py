@@ -7,14 +7,18 @@ def get_roles():
 
 
 class ChatSession(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User, on_delete=models.DO_NOTHING, default=None
+    )
     topic = models.CharField(max_length=255)
     creation_date_time = models.DateTimeField(auto_now_add=True)
 
 
 class Message(models.Model):
     session = models.ForeignKey(
-        ChatSession, on_delete=models.CASCADE, default=ChatSession.objects.first().pk
+        ChatSession,
+        on_delete=models.CASCADE,
+        default=[],
     )
     role = models.CharField(max_length=16, choices=get_roles)
     content = models.CharField(max_length=1024)
