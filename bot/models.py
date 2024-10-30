@@ -20,7 +20,7 @@ class Message(models.Model):
         on_delete=models.CASCADE,
         default=[],
     )
-    role = models.CharField(max_length=16, choices=get_roles)
+    role = models.CharField(max_length=16, choices=get_roles())
     content = models.CharField(max_length=1024)
     temperature = models.DecimalField(max_digits=2, decimal_places=1)
     creation_date_time = models.DateTimeField(auto_now_add=True)
