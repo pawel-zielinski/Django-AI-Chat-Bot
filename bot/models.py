@@ -3,7 +3,7 @@ from django.db import models
 
 
 def get_roles():
-    return {"user": "user", "system": "system", "assistant": "assistant"}
+    return [("user", "user"), ("system", "system"), ("assistant", "assistant")]
 
 
 class ChatSession(models.Model):
