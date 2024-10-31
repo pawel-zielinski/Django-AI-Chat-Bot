@@ -1,7 +1,12 @@
 import os
 
 from rest_framework import viewsets, status
-from rest_framework.mixins import RetrieveModelMixin, ListModelMixin, CreateModelMixin
+from rest_framework.mixins import (
+    RetrieveModelMixin,
+    ListModelMixin,
+    CreateModelMixin,
+    DestroyModelMixin,
+)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -19,7 +24,11 @@ genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
 
 
 class PromptViewSet(
-    GenericViewSet, RetrieveModelMixin, ListModelMixin, CreateModelMixin
+    GenericViewSet,
+    RetrieveModelMixin,
+    ListModelMixin,
+    CreateModelMixin,
+    DestroyModelMixin,
 ):
     queryset = ChatSession.objects.all()
     serializer_class = RoomSerializer
@@ -81,14 +90,22 @@ class PromptViewSet(
         )
 
     def chat_prompt(self, serializer):
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = self.get_ai_model()
         history = self.create_history(serializer)
-        chat = model.start_chat(
-            history=history,
-        )
+        chat = self.start_ai_chat(history, model)
         temperature = float(serializer.data.get("temperature"))
         response = chat.send_message(serializer.data.get("content"), stream=False)
         self.save_qa(serializer.data.get("session"), response.text, temperature)
+
+    @staticmethod
+    def start_ai_chat(history, model):
+        return model.start_chat(
+            history=history,
+        )
+
+    @staticmethod
+    def get_ai_model():
+        return genai.GenerativeModel("gemini-1.5-flash")
 
     @staticmethod
     def create_history(serializer):
