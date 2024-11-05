@@ -69,10 +69,9 @@ def test_retrieve_session(auth_client, chat_session):
 @pytest.mark.django_db
 def test_create_session(auth_client, user):
     url = reverse("sessions-create")
-    data = {"user": user, "topic": "New Session"}
-    response = auth_client.post(url, data)
+    response = auth_client.post(url)
     assert response.status_code == status.HTTP_201_CREATED
-    assert response.data["topic"] == "New Session"
+    assert response.data["topic"] == "New chat"
 
 
 @pytest.mark.skip("WIP")
