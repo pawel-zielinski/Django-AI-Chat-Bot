@@ -2,8 +2,9 @@ import { useParams } from 'react-router';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
-function getChatHistory(id) {
-    const [data, setData] = useState([]);
+const getChatHistory = (id) => {
+    const [qa, setQA] = useState([]);
+    const [topic, setTopic] = useState([]);
 
     useEffect(() => {
     if (localStorage.getItem('access_token') === null) {
@@ -17,14 +18,15 @@ function getChatHistory(id) {
                 'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
             },
           });
-          setData(data.qa);
-          return data;
+          setQA(data.qa);
+          setTopic(data.topic);
         } catch (e) {
           console.log('not auth');
         }
       })();
     }
   }, []);
+  return {"data": qa, "topic": topic};
 }
 
 const RenderChat = () => {
@@ -33,7 +35,7 @@ const RenderChat = () => {
     console.log(chat_history);
     return (
         <div>
-            <h1>{id}</h1>
+            <h1>{chat_history.topic}</h1>
         </div>
     )
 }

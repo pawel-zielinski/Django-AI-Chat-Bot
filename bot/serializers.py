@@ -33,7 +33,7 @@ class RoomSerializer(BaseSerializer):
 class SessionsSerializer(serializers.Serializer):
     class Meta:
         model = ChatSession
-        fields = ("pk", "topic", "creation_date_time")
+        fields = ("pk", "topic")
 
     def to_representation(self, instance):
         return {
@@ -44,9 +44,7 @@ class SessionsSerializer(serializers.Serializer):
 
     def to_internal_value(self, data):
         return {
-            "user": User.objects.get(username=data.get("user")),
-            "topic": data.get("topic"),
-            "creation_date_time": data.get("creation_date_time"),
+            "user": self.context.get("request").user,
         }
 
     def create(self, validated_data):
