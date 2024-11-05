@@ -1,6 +1,61 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+
+const handleDelete = (props) => {
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`http://localhost:8000/home/${props.id}/delete`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+        },
+      });
+      window.location.href = '/';
+    } catch (e) {
+      console.log(e);
+    }
+  }
+  if (localStorage.getItem('access_token') !== null) {
+    return handleDelete();
+  }
+}
+
+const DeleteButton = (props) => {
+  if (localStorage.getItem('access_token') !== null) {
+    return (
+        <button onClick={() => handleDelete(props)} className="btn btn-danger">Delete</button>
+    );
+  }
+}
+
+const handleCreate = async () => {
+  const handleCreate = async () => {
+    try {
+      let response = await axios.post('http://localhost:8000/create_session', {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+        },
+      });
+      window.location.href = '/home/' + response.data.pk;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+  if (localStorage.getItem('access_token') !== null) {
+      return handleCreate();
+  }
+}
+
+const CreateButton = () => {
+    if (localStorage.getItem('access_token') !== null) {
+        return (
+            <button onClick={handleCreate} className="btn btn-primary">Start Chat</button>
+        );
+    }
+}
+
 // Define the Home function.
 export const RenderHome = () => {
   const [topic, setTopic] = useState([]);
@@ -36,8 +91,10 @@ export const RenderHome = () => {
       <div key={index}>
         <a className="chat-session-link" href={"/home/" + id[index]}>{t}</a>
         <h3><i>{new Date(time[index]).toLocaleString()}</i></h3>
+        <DeleteButton id={id[index]} />
       </div>
     ))}
+    <CreateButton />
     </div>
     </>
   );

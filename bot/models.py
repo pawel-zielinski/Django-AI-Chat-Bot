@@ -7,10 +7,8 @@ def get_roles():
 
 
 class ChatSession(models.Model):
-    user = models.ForeignKey(
-        User, on_delete=models.DO_NOTHING, default=None
-    )
-    topic = models.CharField(max_length=255)
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, default=None)
+    topic = models.CharField(max_length=255, default="New chat")
     creation_date_time = models.DateTimeField(auto_now_add=True)
 
 

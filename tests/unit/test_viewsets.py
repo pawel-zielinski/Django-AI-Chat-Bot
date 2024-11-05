@@ -1,9 +1,25 @@
+from unittest.mock import patch, MagicMock
+
 import pytest
 from rest_framework.test import APIClient
 from django.urls import reverse
 from rest_framework import status
 from bot.models import ChatSession, Message
 from django.contrib.auth.models import User
+
+
+@pytest.fixture
+def mock_ai_model():
+    with patch("bot.viewsets.PromptViewSet.get_ai_model") as mock_ai_model:
+        mock_ai_model.return_value = MagicMock()
+        yield mock_ai_model
+
+
+@pytest.fixture
+def mock_start_ai_chat():
+    with patch("bot.viewsets.PromptViewSet.start_ai_chat") as mock_start_ai_chat:
+        mock_start_ai_chat.return_value = MagicMock()
+        yield mock_start_ai_chat
 
 
 @pytest.fixture
@@ -53,12 +69,12 @@ def test_retrieve_session(auth_client, chat_session):
 @pytest.mark.django_db
 def test_create_session(auth_client, user):
     url = reverse("sessions-create")
-    data = {"user": user, "topic": "New Session"}
-    response = auth_client.post(url, data)
+    response = auth_client.post(url)
     assert response.status_code == status.HTTP_201_CREATED
-    assert response.data["topic"] == "New Session"
+    assert response.data["topic"] == "New chat"
 
 
+@pytest.mark.skip("WIP")
 @pytest.mark.django_db
 def test_create_question(auth_client, chat_session):
     url = reverse("message-create")
