@@ -46,3 +46,40 @@
   font-weight: bold;
   font-size: 2em;
 }
+
+.chat-bubble-user {
+    width: fit-content;
+    background-color: #3188bb;
+    color: white;
+    border-radius: 1em;
+    padding: 1em;
+    margin: 1em;
+    max-width: 80%;
+    margin-left: auto;
+}
+
+.chat-bubble-system {
+    background-color: #4f4f4f;
+    color: #ffffff;
+    border-radius: 1em;
+    padding: 1em;
+    margin: 1em;
+    max-width: 80%;
+    text-align: left;
+}
+
+.chat-bubble-date-user {
+    color: #888;
+    font-size: 0.8em;
+    margin: 1em;
+    text-align: right;
+    font-style: italic;
+}
+
+.chat-bubble-date-system {
+    color: #888;
+    font-size: 0.8em;
+    margin: 1em;
+    text-align: left;
+    font-style: italic;
+}
