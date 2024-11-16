@@ -33,7 +33,6 @@ const getChatHistory = (id) => {
 const ChatBubbles = ( data ) => {
     var listOfMessages = Object.values(data.data.qa).map((item) => Object.values(item)[0]);
     var listOfDates = Object.keys(data.data.qa);
-    console.log(listOfDates);
     return (
       <>
     {Array.isArray(listOfMessages) ? listOfMessages.map((item, index) => (
@@ -49,6 +48,7 @@ const ChatBubbles = ( data ) => {
 }
 
 const TextField = ({id}) => {
+    window.scrollTo(0, document.body.scrollHeight);
     const [message, setMessage] = useState('');
 
     const handleSendMessage = async (id) => {
@@ -74,13 +74,16 @@ const TextField = ({id}) => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('access_token')}`
                 }
+            }).then(response => {
+                if (response.status === 201) {
+                //     hide the blinking animation bubble
+                //     create a new chat-bubble-system field with the response.response_text
+                //     create a new chat-bubble-date-system field with the response.response_date
+                //     scroll to the bottom of the page
+                }
             });
 
-            // Fetch new chat history and refresh the page without user seeing the refresh
-            const chatHistory = await getChatHistory(id);
-            document.querySelector('.chat-bubble-user.blinking').remove();
-            document.querySelector('.chat-bubbles').innerHTML = ChatBubbles({ data: chatHistory }).props.children;
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
         } catch (e) {
             console.log('Error sending message:', e);
         }
