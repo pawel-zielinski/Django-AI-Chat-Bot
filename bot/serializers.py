@@ -54,7 +54,7 @@ class SessionsSerializer(serializers.Serializer):
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
-        fields = ("session", "role", "content", "temperature")
+        fields = ("id", "session", "role", "content", "temperature")
 
     @staticmethod
     def validate_role(value):

@@ -5,6 +5,7 @@ import RenderLogIn from './components/LogIn';
 import RenderLogOut from './components/LogOut';
 import RenderChat from './components/Chat';
 import './App.css'
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 function App() {
 
