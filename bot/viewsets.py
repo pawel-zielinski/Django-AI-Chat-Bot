@@ -86,7 +86,9 @@ class PromptViewSet(
         headers = self.get_success_headers(serializer.data)
         response_text, response_date = self.chat_prompt(serializer)
         return Response(
-            {'response_text': response_text, 'response_date': response_date}, status=status.HTTP_201_CREATED, headers=headers
+            {"response_text": response_text, "response_date": response_date},
+            status=status.HTTP_201_CREATED,
+            headers=headers,
         )
 
     def chat_prompt(self, serializer):
@@ -95,7 +97,12 @@ class PromptViewSet(
         chat = self.start_ai_chat(history, model)
         temperature = float(serializer.data.get("temperature"))
         response = chat.send_message(serializer.data.get("content"), stream=False).text
-        return response, self.save_qa(serializer.data.get("session"), response, temperature).creation_date_time
+        return (
+            response,
+            self.save_qa(
+                serializer.data.get("session"), response, temperature
+            ).creation_date_time,
+        )
 
     @staticmethod
     def start_ai_chat(history, model):

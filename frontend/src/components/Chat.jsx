@@ -76,14 +76,26 @@ const TextField = ({id}) => {
                 }
             }).then(response => {
                 if (response.status === 201) {
-                //     hide the blinking animation bubble
-                //     create a new chat-bubble-system field with the response.response_text
-                //     create a new chat-bubble-date-system field with the response.response_date
-                //     scroll to the bottom of the page
+                    // Hide the blinking animation bubble
+                    chatBubble.classList.remove('blinking');
+
+                    // Create a new chat-bubble-system field with the response.response_text
+                    const systemBubble = document.createElement('div');
+                    systemBubble.className = 'chat-bubble-system';
+                    console.log(response.data);
+                    systemBubble.innerHTML = response.data.response_text;
+                    document.querySelector('.chat-text-field').insertAdjacentElement('beforebegin', systemBubble);
+
+                    // Create a new chat-bubble-date-system field with the response.response_date
+                    const dateBubble = document.createElement('div');
+                    dateBubble.className = 'chat-bubble-date-system';
+                    dateBubble.innerHTML = new Date(response.data.response_date).toLocaleString();
+                    document.querySelector('.chat-text-field').insertAdjacentElement('beforebegin', dateBubble);
+
+                    // Scroll to the bottom of the page
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
                 }
             });
-
-
         } catch (e) {
             console.log('Error sending message:', e);
         }
