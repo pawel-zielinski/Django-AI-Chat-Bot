@@ -58,7 +58,7 @@
     margin-left: auto;
 }
 
-.chat-bubble-system {
+.chat-bubble-model {
     background-color: #4f4f4f;
     color: #ffffff;
     border-radius: 1em;
@@ -76,7 +76,7 @@
     font-style: italic;
 }
 
-.chat-bubble-date-system {
+.chat-bubble-date-model {
     color: #888;
     font-size: 0.8em;
     margin: 1em;
@@ -124,6 +124,13 @@
 
 .blinking {
     animation: blink 1.5s infinite;
+}
+
+.chat-container {
+    height: 100px;
+    overflow: auto;
+    display: flex;
+    flex-direction: column-reverse;
 }
 
 @keyframes blink {

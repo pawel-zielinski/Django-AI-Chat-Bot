@@ -32,15 +32,16 @@ const getChatHistory = (id) => {
 
 const ChatBubbles = ( data ) => {
     var listOfMessages = Object.values(data.data.qa).map((item) => Object.values(item)[0]);
+    var listOfEntities = Object.values(data.data.qa).map((item) => Object.keys(item)[0]);
     var listOfDates = Object.keys(data.data.qa);
     return (
       <>
     {Array.isArray(listOfMessages) ? listOfMessages.map((item, index) => (
         <>
-            <div key={index} className={`chat-bubble-${index % 2 === 0 ? 'user' : 'system'}`}>
+            <div key={index} className={`chat-bubble-${listOfEntities[index]}`}>
                 <div key={`message-${index}`} className="chat-bubble-text" dangerouslySetInnerHTML={{__html: marked(item)}}></div>
             </div>
-            <div key={`date-${index}`} className={`chat-bubble-date-${index % 2 === 0 ? 'user' : 'system'}`}>{listOfDates[index]}</div>
+            <div key={`date-${index}`} className={`chat-bubble-date-${listOfEntities[index]}`}>{listOfDates[index]}</div>
             </>
             )) : null}
         </>
@@ -48,7 +49,6 @@ const ChatBubbles = ( data ) => {
 }
 
 const TextField = ({id}) => {
-    window.scrollTo(0, document.body.scrollHeight);
     const [message, setMessage] = useState('');
 
     const handleSendMessage = async (id) => {
@@ -56,7 +56,6 @@ const TextField = ({id}) => {
         const newMessage = message;
         setMessage('');
 
-        // Create a new blinking animated chat-bubble-user field
         const chatBubble = document.createElement('div');
         chatBubble.className = 'chat-bubble-user blinking';
         chatBubble.innerHTML = newMessage;
@@ -76,23 +75,18 @@ const TextField = ({id}) => {
                 }
             }).then(response => {
                 if (response.status === 201) {
-                    // Hide the blinking animation bubble
                     chatBubble.classList.remove('blinking');
 
-                    // Create a new chat-bubble-system field with the response.response_text
                     const systemBubble = document.createElement('div');
-                    systemBubble.className = 'chat-bubble-system';
-                    console.log(response.data);
+                    systemBubble.className = 'chat-bubble-model';
                     systemBubble.innerHTML = response.data.response_text;
                     document.querySelector('.chat-text-field').insertAdjacentElement('beforebegin', systemBubble);
 
-                    // Create a new chat-bubble-date-system field with the response.response_date
                     const dateBubble = document.createElement('div');
-                    dateBubble.className = 'chat-bubble-date-system';
+                    dateBubble.className = 'chat-bubble-date-model';
                     dateBubble.innerHTML = new Date(response.data.response_date).toLocaleString();
                     document.querySelector('.chat-text-field').insertAdjacentElement('beforebegin', dateBubble);
 
-                    // Scroll to the bottom of the page
                     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
                 }
             });
