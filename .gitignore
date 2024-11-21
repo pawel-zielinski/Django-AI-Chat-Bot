@@ -28,6 +28,7 @@ bower_components/
 .installed.cfg
 *.egg
 MANIFEST
+frontend/.vite/*
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

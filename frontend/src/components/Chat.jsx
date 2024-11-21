@@ -48,10 +48,10 @@ const ChatBubbles = ( data ) => {
     )
 }
 
-const TextField = ({id}) => {
+const TextField = ({id, is_first}) => {
     const [message, setMessage] = useState('');
 
-    const handleSendMessage = async (id) => {
+    const handleSendMessage = async (id, is_first) => {
     if (message.trim()) {
         const newMessage = message;
         setMessage('');
@@ -75,16 +75,26 @@ const TextField = ({id}) => {
                 }
             }).then(response => {
                 if (response.status === 201) {
+                    if (is_first) {
+                        axios.post(`http://localhost:8000/create_topic`,
+                            {'history_context': response.data.response_text,
+                            'session_id': window.location.href.split('/').pop()}, {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+                            }
+                        });
+                    }
                     chatBubble.classList.remove('blinking');
 
                     const systemBubble = document.createElement('div');
                     systemBubble.className = 'chat-bubble-model';
-                    systemBubble.innerHTML = response.data.response_text;
+                    systemBubble.innerHTML = marked(response.data.response_text);
                     document.querySelector('.chat-text-field').insertAdjacentElement('beforebegin', systemBubble);
 
                     const dateBubble = document.createElement('div');
                     dateBubble.className = 'chat-bubble-date-model';
-                    dateBubble.innerHTML = new Date(response.data.response_date).toLocaleString();
+                    dateBubble.innerHTML = new Date(response.data.response_date).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
                     document.querySelector('.chat-text-field').insertAdjacentElement('beforebegin', dateBubble);
 
                     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
@@ -98,7 +108,7 @@ const TextField = ({id}) => {
 
     const handleKeyPress = (event, id) => {
         if (event.key === 'Enter') {
-            handleSendMessage(id);
+            handleSendMessage(id, is_first);
         }
     };
 
@@ -122,11 +132,12 @@ const TextField = ({id}) => {
 const RenderChat = () => {
     const { id } = useParams();
     const chat_history = getChatHistory(id);
+    const is_first = Object.keys(chat_history.qa).length === 0;
     return (
         <>
-            <h1>{chat_history.topic}</h1>
+            <h1 className={'topic-header'}>{chat_history.topic}</h1>
             <ChatBubbles data={chat_history}/>
-            <TextField id={id}/>
+            <TextField id={id} is_first={is_first}/>
             <div style={{height: '100px'}}></div>
         </>
     )

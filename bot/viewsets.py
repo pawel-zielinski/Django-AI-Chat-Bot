@@ -91,6 +91,22 @@ class PromptViewSet(
             headers=headers,
         )
 
+    @action(detail=True, methods=["post"])
+    def create_topic(self, request, *args, **kwargs):
+        history_context = request.data.get("history_context")
+        session_id = request.data.get("session_id")
+        topic = self.prompt_for_topic(history_context).text.strip("\n")
+        ChatSession.objects.filter(pk=session_id).update(topic=topic)
+        return Response({"topic": topic}, status=status.HTTP_200_OK)
+
+    def prompt_for_topic(self, history_context):
+        model = self.get_ai_model()
+        topic = model.generate_content(
+            "Create a short topic for the chat, based on the following context: "
+            + history_context
+        )
+        return topic
+
     def chat_prompt(self, serializer):
         model = self.get_ai_model()
         history = self.create_history(serializer)
