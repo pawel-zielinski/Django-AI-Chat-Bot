@@ -5,6 +5,12 @@
   text-align: center;
 }
 
+.navbar-component {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -135,7 +141,7 @@
 
 .topic-header {
     position: fixed;
-    top: 0;
+    top: 54px;
     left: 50%;
     transform: translateX(-50%);
     width: 100%;
@@ -146,6 +152,32 @@
     z-index: 1000;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     margin-top: 0;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: rgb(198, 222, 241);
+}
+
+li {
+  float: left;
+  padding-left: 1px;
+  padding-right: 1px;
+}
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+li a:hover {
+  background-color: rgb(17, 17, 17);
 }
 
 @keyframes blink {
