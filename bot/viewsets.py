@@ -84,18 +84,41 @@ class PromptViewSet(
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        self.chat_prompt(serializer)
+        response_text, response_date = self.chat_prompt(serializer)
         return Response(
-            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+            {"response_text": response_text, "response_date": response_date},
+            status=status.HTTP_201_CREATED,
+            headers=headers,
         )
+
+    @action(detail=True, methods=["post"])
+    def create_topic(self, request, *args, **kwargs):
+        history_context = request.data.get("history_context")
+        session_id = request.data.get("session_id")
+        topic = self.prompt_for_topic(history_context).text.strip("\n")
+        ChatSession.objects.filter(pk=session_id).update(topic=topic)
+        return Response({"topic": topic}, status=status.HTTP_200_OK)
+
+    def prompt_for_topic(self, history_context):
+        model = self.get_ai_model()
+        topic = model.generate_content(
+            "Create a short topic for the chat, based on the following context: "
+            + history_context
+        )
+        return topic
 
     def chat_prompt(self, serializer):
         model = self.get_ai_model()
         history = self.create_history(serializer)
         chat = self.start_ai_chat(history, model)
         temperature = float(serializer.data.get("temperature"))
-        response = chat.send_message(serializer.data.get("content"), stream=False)
-        self.save_qa(serializer.data.get("session"), response.text, temperature)
+        response = chat.send_message(serializer.data.get("content"), stream=False).text
+        return (
+            response,
+            self.save_qa(
+                serializer.data.get("session"), response, temperature
+            ).creation_date_time,
+        )
 
     @staticmethod
     def start_ai_chat(history, model):
@@ -118,7 +141,7 @@ class PromptViewSet(
 
     @staticmethod
     def save_qa(session, answer, temperature):
-        Message.objects.create(
+        return Message.objects.create(
             session_id=session, role="model", content=answer, temperature=temperature
         )
 

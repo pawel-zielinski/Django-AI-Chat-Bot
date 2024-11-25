@@ -11,6 +11,9 @@ class ChatSession(models.Model):
     topic = models.CharField(max_length=255, default="New chat")
     creation_date_time = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.topic} - {self.creation_date_time}"
+
 
 class Message(models.Model):
     session = models.ForeignKey(
@@ -22,3 +25,6 @@ class Message(models.Model):
     content = models.CharField(max_length=1024)
     temperature = models.DecimalField(max_digits=2, decimal_places=1)
     creation_date_time = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.session.topic} - {self.content[:20]}"

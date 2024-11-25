@@ -31,4 +31,9 @@ urlpatterns = [
         PromptViewSet.as_view({"post": "create_question"}),
         name="message-create",
     ),
+    path(
+        "create_topic",
+        PromptViewSet.as_view({"post": "create_topic"}),
+        name="topic_create",
+    ),
 ]

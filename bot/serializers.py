@@ -21,11 +21,11 @@ class RoomSerializer(BaseSerializer):
     @staticmethod
     def qa_to_json(qa):
         response = {}
-        for creation_date_time, content, temperature in qa.values_list(
-            "creation_date_time", "content", "temperature"
+        for creation_date_time, content, role in qa.values_list(
+            "creation_date_time", "content", "role"
         ):
             response[creation_date_time.strftime("%d %b %Y %H:%M:%S")] = {
-                float(temperature): content
+                role: content,
             }
         return response
 
@@ -54,7 +54,7 @@ class SessionsSerializer(serializers.Serializer):
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
-        fields = ("session", "role", "content", "temperature")
+        fields = ("id", "session", "role", "content", "temperature")
 
     @staticmethod
     def validate_role(value):

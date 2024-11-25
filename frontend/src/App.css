@@ -5,6 +5,12 @@
   text-align: center;
 }
 
+.navbar-component {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -45,4 +51,137 @@
   color: #646cff;
   font-weight: bold;
   font-size: 2em;
+}
+
+.chat-bubble-user {
+    width: fit-content;
+    background-color: #3188bb;
+    color: white;
+    border-radius: 1em;
+    padding: 1em;
+    margin: 1em;
+    max-width: 80%;
+    margin-left: auto;
+}
+
+.chat-bubble-model {
+    background-color: #4f4f4f;
+    color: #ffffff;
+    border-radius: 1em;
+    padding: 1em;
+    margin: 1em;
+    max-width: 80%;
+    text-align: left;
+}
+
+.chat-bubble-date-user {
+    color: #888;
+    font-size: 0.8em;
+    margin: 1em;
+    text-align: right;
+    font-style: italic;
+}
+
+.chat-bubble-date-model {
+    color: #888;
+    font-size: 0.8em;
+    margin: 1em;
+    text-align: left;
+    font-style: italic;
+}
+
+.chat-text-field {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #26282d;
+    padding: 1.5em;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+}
+
+.chat-text-field input {
+    flex: 1;
+    padding: 0.75em;
+    margin-right: 1em;
+    border: 1px solid #ddd;
+    border-radius: 0.5em;
+    font-size: 1em;
+}
+
+.chat-text-field button {
+    padding: 0.75em 1.5em;
+    background-color: #3188bb;
+    color: white;
+    border: none;
+    border-radius: 0.5em;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.chat-text-field button:hover {
+    background-color: #26729e;
+}
+
+.blinking {
+    animation: blink 1.5s infinite;
+}
+
+.chat-container {
+    height: 100px;
+    overflow: auto;
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.topic-header {
+    position: fixed;
+    top: 54px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    background: #26282d;
+    color: white;
+    padding: 1rem;
+    text-align: center;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 0;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: rgb(198, 222, 241);
+}
+
+li {
+  float: left;
+  padding-left: 1px;
+  padding-right: 1px;
+}
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+li a:hover {
+  background-color: rgb(17, 17, 17);
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
 }
